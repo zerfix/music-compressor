@@ -1,0 +1,10 @@
+[package]
+name = "music-compressor"
+version = "0.1.0"
+authors = ["zerfix <zerfix@protonmail.com>"]
+edition = "2018"
+
+[dependencies]
+notify = "4.0.15"
+# hotwatch = "0.4.3"  # folder listener
+dotenv   = "0.15.0" # env

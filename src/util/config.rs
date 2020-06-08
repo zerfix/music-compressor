@@ -1,0 +1,36 @@
+// std
+use std::collections::HashMap;
+use std::env;
+// lib
+use dotenv::dotenv;
+
+//-////////////////////////////////////////////////////////////////////////////
+//
+//-////////////////////////////////////////////////////////////////////////////
+#[derive(Clone)]
+pub struct Config {
+    pub input_dir: String,
+    pub output_dir: String,
+}
+//-////////////////////////////////////////////////////////////////////////////
+//
+//-////////////////////////////////////////////////////////////////////////////
+impl Config {
+    pub fn from_env() -> Config {
+        dotenv().ok();
+        let mut entries: HashMap<_, _> = ["INPUT_DIR", "OUTPUT_DIR"]
+            .iter()
+            .map(|x| match env::var(x) {
+                Ok(k) => (*x, k),
+                Err(err) => panic!("ENV variable {} is missing!\n{}", x, err),
+            })
+            .collect();
+        Config {
+            input_dir: entries.remove("INPUT_DIR").unwrap(),
+            output_dir: entries.remove("OUTPUT_DIR").unwrap(),
+        }
+    }
+}
+//-////////////////////////////////////////////////////////////////////////////
+//
+//-////////////////////////////////////////////////////////////////////////////

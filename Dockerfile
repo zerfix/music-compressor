@@ -1,19 +1,26 @@
-# --- builder -----------------------------------------------------------------
-From rust:latest as builder
+# --- Builder -----------------------------------------------------------------
+FROM rust:alpine as builder
 
+# - Build cache ---
+RUN cargo new --bin /usr/src/music-compressor
 WORKDIR /usr/src/music-compressor
 
-COPY ./Cargo.lock ./Cargo.lock
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./src ./src
+COPY Cargo.* ./
+RUN cargo build --release \
+    && rm target/release/* -rf
 
-RUN cargo install --path .
+# - Compile ---
+COPY ./src/ ./src/
+RUN cargo build --release
 
-# --- runner ------------------------------------------------------------------
-FROM debian:stable-slim
+# --- Executioner -------------------------------------------------------------
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y libc-bin opus-tools
+# Runtime Dependencies
+RUN apk upgrade \
+    && apk add \
+        opus-tools
 
-COPY --from=builder /usr/local/cargo/bin/music-compressor /usr/local/bin/music-compressor
+COPY --from=builder /usr/src/music-compressor/target/release/music-compressor /usr/local/bin/
 
-CMD ["music-compressor"]
+CMD /usr/local/bin/music-compressor

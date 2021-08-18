@@ -1,20 +1,23 @@
-// std
 use std::collections::HashMap;
 use std::env;
-// lib
+use std::path::PathBuf;
+
 use dotenv::dotenv;
 
 //-////////////////////////////////////////////////////////////////////////////
-//
+//  Programm Config
 //-////////////////////////////////////////////////////////////////////////////
 #[derive(Clone)]
 pub struct Config {
-    pub input_dir: String,
-    pub output_dir: String,
+    pub dir: Dir,
 }
-//-////////////////////////////////////////////////////////////////////////////
-//
-//-////////////////////////////////////////////////////////////////////////////
+
+#[derive(Clone)]
+pub struct Dir {
+    pub inn: PathBuf,
+    pub out: PathBuf,
+}
+
 impl Config {
     pub fn from_env() -> Config {
         dotenv().ok();
@@ -26,8 +29,10 @@ impl Config {
             })
             .collect();
         Config {
-            input_dir: entries.remove("INPUT_DIR").unwrap(),
-            output_dir: entries.remove("OUTPUT_DIR").unwrap(),
+            dir: Dir {
+                inn: PathBuf::from(entries.remove("INPUT_DIR").unwrap()),
+                out: PathBuf::from(entries.remove("OUTPUT_DIR").unwrap()),
+            }
         }
     }
 }

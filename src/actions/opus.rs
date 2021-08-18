@@ -1,17 +1,17 @@
-// std
 use std::io;
+use std::path::PathBuf;
 use std::process::Command;
 
 //-////////////////////////////////////////////////////////////////////////////
-// Opus
+//  Opus
 //-////////////////////////////////////////////////////////////////////////////
-pub fn compress(input_path: String, output_path: String) -> Result<(), io::Error> {
+/// Compress lossless to opus with shell command.
+pub fn compress(input_path: &PathBuf, output_path: &PathBuf) -> Result<(), io::Error> {
     Command::new("opusenc")
         .arg("--downmix-stereo")
         .arg(input_path)
         .arg(output_path)
         .output()?;
-
     Ok(())
 }
 //-////////////////////////////////////////////////////////////////////////////

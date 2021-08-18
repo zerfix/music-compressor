@@ -18,6 +18,9 @@ mod types {
 }
 //-////////////////////////////////////////////////////////////////////////////
 
+#[macro_use]
+extern crate lazy_static;
+
 use std::sync::mpsc::channel;
 use std::thread;
 
@@ -28,30 +31,35 @@ use services::input_listener::listen;
 use types::config::Config;
 
 //-////////////////////////////////////////////////////////////////////////////
+//  static
+//-////////////////////////////////////////////////////////////////////////////
+lazy_static!{
+    static ref CONF: Config = Config::from_env();
+}
+
+//-////////////////////////////////////////////////////////////////////////////
 //  main
 //-////////////////////////////////////////////////////////////////////////////
 fn main() {
-    let config = Config::from_env();
-    init_directories(&config.dir).unwrap();
+    init_directories(&CONF.dir).unwrap();
 
     // initial sync
     let (tx, rx) = channel();
     println!("--- T0 Comparing -------------");
-    init_sync(&tx, &config.dir);
+    init_sync(&tx, &CONF.dir);
 
     // listen thread
     let _listener = {
-        let config = config.clone();
         thread::Builder::new()
             .name("compressor".to_string())
-            .spawn(move || listen(config, tx))
+            .spawn(move || listen(tx))
             .unwrap()
     };
     println!("--- T1 Listening -------------");
 
     // compress
     println!("--- T0 Compressing -----------");
-    compress(rx, config);
+    compress(rx);
 }
 //-////////////////////////////////////////////////////////////////////////////
 //

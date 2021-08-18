@@ -6,18 +6,18 @@ use notify::RecommendedWatcher;
 use notify::RecursiveMode;
 use notify::Watcher;
 
+use crate::CONF;
 use crate::types::com::Actions;
-use crate::types::config::Config;
 
 //-////////////////////////////////////////////////////////////////////////////
 //  File system listener
 //-////////////////////////////////////////////////////////////////////////////
 /// Listens for changes in input folder.
-pub fn listen(config: Config, comp_tx: Sender<Actions>) {
+pub fn listen(comp_tx: Sender<Actions>) {
     let (tx, rx) = channel();
 
     let mut watcher: RecommendedWatcher = Watcher::new(tx, Duration::from_secs(1)).unwrap();
-    watcher.watch(config.dir.inn, RecursiveMode::Recursive).unwrap();
+    watcher.watch(CONF.dir.inn.clone(), RecursiveMode::Recursive).unwrap();
 
     for event in rx {
         match match event {
